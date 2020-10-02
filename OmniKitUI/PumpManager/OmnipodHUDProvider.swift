@@ -31,6 +31,10 @@ internal class OmnipodHUDProvider: NSObject, HUDProvider, PodStateObserver {
                 updateReservoirView()
             }
             
+            if oldValue?.isFaulted != podState?.isFaulted {
+                updateFaultDisplay()
+            }
+            
             if oldValue != nil && podState == nil {
                 updateReservoirView()
             }
@@ -67,7 +71,7 @@ internal class OmnipodHUDProvider: NSObject, HUDProvider, PodStateObserver {
             let reservoirView = reservoirView,
             let podState = podState
         {
-            let reservoirVolume = lastInsulinMeasurements.reservoirVolume
+            let reservoirVolume = lastInsulinMeasurements.reservoirLevel
 
             let reservoirLevel = reservoirVolume?.asReservoirPercentage()
 
@@ -91,7 +95,7 @@ internal class OmnipodHUDProvider: NSObject, HUDProvider, PodStateObserver {
     }
     
     public func didTapOnHUDView(_ view: BaseHUDView) -> HUDTapAction? {
-        if podState?.fault != nil {
+        if let podState = self.podState, podState.isFaulted {
             return HUDTapAction.presentViewController(PodReplacementNavigationController.instantiatePodReplacementFlow(pumpManager))
         } else {
             return HUDTapAction.presentViewController(pumpManager.settingsViewController(insulinTintColor: insulinTintColor, guidanceColors: guidanceColors))
@@ -111,7 +115,7 @@ internal class OmnipodHUDProvider: NSObject, HUDProvider, PodStateObserver {
         }
         
         if let lastInsulinMeasurements = podState?.lastInsulinMeasurements {
-            rawValue["reservoirVolume"] = lastInsulinMeasurements.reservoirVolume
+            rawValue["reservoirVolume"] = lastInsulinMeasurements.reservoirLevel
             rawValue["validTime"] = lastInsulinMeasurements.validTime
         }
         
