@@ -367,8 +367,8 @@ extension OmnipodPumpManager {
                                                      state: .critical)
         }
         
-        if let reservoir = podState.lastInsulinMeasurements, let volume = reservoir.reservoirVolume {
-            if volume <= 0 {
+        if let reservoir = podState.lastInsulinMeasurements, let level = reservoir.reservoirLevel {
+            if level <= 0 {
                 return PumpManagerStatus.PumpStatusHighlight(
                     localizedMessage: NSLocalizedString("No Insulin", comment: "Status highlight that a pump is out of insulin."),
                     imageName: "exclamationmark.circle.fill",
@@ -721,12 +721,13 @@ extension OmnipodPumpManager {
         }
     }
 
-    public func refreshStatus() {
+    public func refreshStatus(completion: ((_ result: PumpManagerResult<StatusResponse>) -> Void)? = nil) {
         guard self.hasActivePod else {
+            completion?(.failure(.deviceState(OmnipodPumpManagerError.noPodPaired)))
             return
         }
 
-        self.getPodStatus(storeDosesOnSuccess: false, completion: nil)
+        self.getPodStatus(storeDosesOnSuccess: false, completion: completion)
     }
 
     // MARK: - Pump Commands

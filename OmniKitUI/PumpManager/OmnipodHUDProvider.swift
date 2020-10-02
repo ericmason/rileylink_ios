@@ -31,10 +31,6 @@ internal class OmnipodHUDProvider: NSObject, HUDProvider, PodStateObserver {
                 updateReservoirView()
             }
             
-            if oldValue?.isFaulted != podState?.isFaulted {
-                updateFaultDisplay()
-            }
-            
             if oldValue != nil && podState == nil {
                 updateReservoirView()
             }
